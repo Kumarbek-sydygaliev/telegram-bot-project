@@ -1,7 +1,15 @@
 import os
+
 import telebot
-import config
+import requests
 from flask import Flask, request
+
+import config
+from req import get_weather
+from messages import hello_message, weather_message
+from buttons import main_markup
+
+
 server = Flask(__name__)
 bot = telebot.TeleBot(config.token)
 
@@ -13,23 +21,25 @@ def recieve_update():
     return {"ok": True}
 
 @bot.message_handler(commands=['start', 'help'])
-def asnwer_start(message):
-    bot.send_message(message.chat.id, 'Привет')
+def answer_start(message):
+    bot.send_message(message.chat.id, hello_message(message.from_user.username), reply_markup=main_markup)
 
 @bot.message_handler(content_types=['text'])
-def asnwer_start(message):
-    bot.send_message(message.chat.id, message.text)
+def answer(message):
+    print(message.text, message.from_user.username)
+    if message.text == 'Погода на сегодня':
+        bot.send_message(message.chat.id, weather_message(get_weather()))
+
 
 @server.route('/' + config.token, methods=['POST'])
 def getMessage():
     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
     return "!", 200
 
-
 @server.route("/")
 def webhook():
     bot.remove_webhook()
-    s = bot.set_webhook(url='https://fb1c405e2c43.ngrok.io' + config.token)
+    s = bot.set_webhook(url='https://964816a548eb.ngrok.io' + config.token)
     if s:
         return print("webhook setup ok")
     else:
