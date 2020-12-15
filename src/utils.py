@@ -18,6 +18,8 @@ def translite(d:dict): # Мини переводчик
         d['name'] = 'Ош'
     elif d['name'] == 'Talas':
         d['name'] = 'Талас'
+    elif d['name'] == 'Jalal-Abad':
+        d['name'] = 'Джалал - Абад'
 
     return d
 
